@@ -179,7 +179,12 @@ public class SyncRequestImpl implements SyncRequestClient {
     public List<PositionRisk> getPositionRisk() {
         return RestApiInvoker.callSync(requestImpl.getPositionRisk());
     }
-    
+
+    @Override
+    public List<PositionRiskV2> getPositionRiskV2() {
+        return RestApiInvoker.callSync(requestImpl.getPositionRiskV2());
+    }
+
     @Override
     public List<MyTrade> getAccountTrades(String symbol, Long startTime, Long endTime, Long fromId, Integer limit) {
         return RestApiInvoker.callSync(requestImpl.getAccountTrades(symbol, startTime, endTime, fromId, limit));
