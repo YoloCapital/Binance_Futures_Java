@@ -211,6 +211,11 @@ public class SyncRequestImpl implements SyncRequestClient {
     }
 
     @Override
+    public List<OpenInterest> getOpenInterest(String symbol) {
+        return RestApiInvoker.callSync(requestImpl.getOpenInterest(symbol));
+    }
+
+    @Override
     public List<OpenInterestStat> getOpenInterestStat(String symbol, PeriodType period, Long startTime, Long endTime, Integer limit) {
         return RestApiInvoker.callSync(requestImpl.getOpenInterestStat(symbol, period, startTime, endTime, limit));
     }

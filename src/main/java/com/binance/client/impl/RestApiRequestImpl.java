@@ -395,8 +395,10 @@ class RestApiRequestImpl {
                 MarkPrice element = new MarkPrice();
                 element.setSymbol(item.getString("symbol"));
                 element.setMarkPrice(item.getBigDecimal("markPrice"));
+                element.setIndexPrice(item.getBigDecimal("indexPrice"));
                 element.setLastFundingRate(item.getBigDecimal("lastFundingRate"));
                 element.setNextFundingTime(item.getLong("nextFundingTime"));
+                element.setInterestRate(item.getBigDecimal("interestRate"));
                 element.setTime(item.getLong("time"));
                 result.add(element);
             });
@@ -1298,6 +1300,34 @@ class RestApiRequestImpl {
 
         request.jsonParser = (jsonWrapper -> {
             String result = "Ok";
+            return result;
+        });
+        return request;
+    }
+
+    RestApiRequest<List<OpenInterest>> getOpenInterest(String symbol) {
+        RestApiRequest<List<OpenInterest>> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build()
+                .putToUrl("symbol", symbol);
+
+        request.request = createRequestByGetWithSignature("/fapi/v1/openInterest", builder);
+
+        request.jsonParser = (jsonWrapper -> {
+            List<OpenInterest> result = new LinkedList<>();
+            JsonWrapperArray dataArray = new JsonWrapperArray(new JSONArray());
+            if (jsonWrapper.containKey("data")) {
+                dataArray = jsonWrapper.getJsonArray("data");
+            } else {
+                dataArray.add(jsonWrapper.convert2JsonObject());
+            }
+            dataArray.forEach((item) -> {
+                OpenInterest element = new OpenInterest();
+                element.setSymbol(item.getString("symbol"));
+                element.setOpenInterest(item.getBigDecimal("openInterest"));
+                element.setTimestamp(item.getLong("time"));
+
+                result.add(element);
+            });
             return result;
         });
         return request;

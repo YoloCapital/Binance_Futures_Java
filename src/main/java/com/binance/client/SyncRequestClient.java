@@ -325,6 +325,13 @@ public interface SyncRequestClient {
     String closeUserDataStream(String listenKey);
 
     /**
+     * Open Interest (MARKET DATA)
+     *
+     * @return Open Interest.
+     */
+    List<OpenInterest> getOpenInterest(String symbol);
+
+    /**
      * Open Interest Stat (MARKET DATA)
      *
      * @return Open Interest Stat.
