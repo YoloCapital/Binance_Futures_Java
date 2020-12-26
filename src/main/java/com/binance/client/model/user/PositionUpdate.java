@@ -16,6 +16,16 @@ public class PositionUpdate {
 
     private BigDecimal unrealizedPnl;
 
+    private String marginType;
+
+    private BigDecimal isolatedWallet;
+
+    private String positionSide;
+
+    private BigDecimal markPrice;
+
+    private BigDecimal maintMarginRequired;
+
     public String getSymbol() {
         return symbol;
     }
@@ -56,10 +66,31 @@ public class PositionUpdate {
         this.unrealizedPnl = unrealizedPnl;
     }
 
+    public String getMarginType() { return marginType; }
+
+    public void setMarginType(String marginType) { this.marginType = marginType; }
+
+    public BigDecimal getIsolatedWallet() { return isolatedWallet; }
+
+    public void setIsolatedWallet(BigDecimal isolatedWallet) { this.isolatedWallet = isolatedWallet; }
+
+    public String getPositionSide() { return positionSide; }
+
+    public void setPositionSide(String positionSide) { this.positionSide = positionSide; }
+
+    public BigDecimal getMarkPrice() { return markPrice; }
+
+    public void setMarkPrice(BigDecimal markPrice) { this.markPrice = markPrice; }
+
+    public BigDecimal getMaintMarginRequired() { return maintMarginRequired; }
+
+    public void setMaintMarginRequired(BigDecimal maintMarginRequired) { this.maintMarginRequired = maintMarginRequired; }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceApiConstants.TO_STRING_BUILDER_STYLE).append("symbol", symbol)
                 .append("amount", amount).append("entryPrice", entryPrice).append("preFee", preFee)
-                .append("unrealizedPnl", unrealizedPnl).toString();
+                .append("unrealizedPnl", unrealizedPnl).append("marginType", marginType)
+                .append("isolatedWallet", isolatedWallet).append("positionSide", positionSide).toString();
     }
 }

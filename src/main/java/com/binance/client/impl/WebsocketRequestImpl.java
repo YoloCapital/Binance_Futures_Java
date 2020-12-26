@@ -19,11 +19,7 @@ import com.binance.client.model.event.SymbolBookTickerEvent;
 import com.binance.client.model.event.SymbolMiniTickerEvent;
 import com.binance.client.model.event.SymbolTickerEvent;
 import com.binance.client.model.market.OrderBookEntry;
-import com.binance.client.model.user.AccountUpdate;
-import com.binance.client.model.user.BalanceUpdate;
-import com.binance.client.model.user.OrderUpdate;
-import com.binance.client.model.user.PositionUpdate;
-import com.binance.client.model.user.UserDataUpdateEvent;
+import com.binance.client.model.user.*;
 
 class WebsocketRequestImpl {
 
@@ -453,17 +449,20 @@ class WebsocketRequestImpl {
                 .shouldNotNull(listenKey, "listenKey")
                 .shouldNotNull(subscriptionListener, "listener");
         WebsocketRequest<UserDataUpdateEvent> request = new WebsocketRequest<>(subscriptionListener, errorHandler);
-        request.name = "***User Data***"; 
+        request.name = "***User Data***";
         request.connectionHandler = (connection) -> connection.send(Channels.userDataChannel(listenKey));
 
         request.jsonParser = (jsonWrapper) -> {
             UserDataUpdateEvent result = new UserDataUpdateEvent();
             result.setEventType(jsonWrapper.getString("e"));
             result.setEventTime(jsonWrapper.getLong("E"));
-            result.setTransactionTime(jsonWrapper.getLong("T"));
 
             if(jsonWrapper.getString("e").equals("ACCOUNT_UPDATE")) {
+                result.setTransactionTime(jsonWrapper.getLong("T"));
+
                 AccountUpdate accountUpdate = new AccountUpdate();
+
+                accountUpdate.setEventReasonType(jsonWrapper.getJsonObject("a").getString("m"));
 
                 List<BalanceUpdate> balanceList = new LinkedList<>();
                 JsonWrapperArray dataArray = jsonWrapper.getJsonObject("a").getJsonArray("B");
@@ -471,12 +470,13 @@ class WebsocketRequestImpl {
                     BalanceUpdate balance = new BalanceUpdate();
                     balance.setAsset(item.getString("a"));
                     balance.setWalletBalance(item.getBigDecimal("wb"));
+                    balance.setCrossWalletBalance(item.getBigDecimal("cw"));
                     balanceList.add(balance);
                 });
                 accountUpdate.setBalances(balanceList);
 
                 List<PositionUpdate> positionList = new LinkedList<>();
-                JsonWrapperArray datalist = jsonWrapper.getJsonObject("a").getJsonArray("B");
+                JsonWrapperArray datalist = jsonWrapper.getJsonObject("a").getJsonArray("P");
                 datalist.forEach(item -> {
                     PositionUpdate position = new PositionUpdate();
                     position.setSymbol(item.getString("s"));
@@ -484,6 +484,9 @@ class WebsocketRequestImpl {
                     position.setEntryPrice(item.getBigDecimal("ep"));
                     position.setPreFee(item.getBigDecimal("cr"));
                     position.setUnrealizedPnl(item.getBigDecimal("up"));
+                    position.setMarginType(item.getString("mt"));
+                    position.setIsolatedWallet(item.getBigDecimal("iw"));
+                    position.setPositionSide(item.getString("ps"));
                     positionList.add(position);
                 });
                 accountUpdate.setPositions(positionList);
@@ -491,6 +494,8 @@ class WebsocketRequestImpl {
                 result.setAccountUpdate(accountUpdate); 
 
             } else if(jsonWrapper.getString("e").equals("ORDER_TRADE_UPDATE")) {
+                result.setTransactionTime(jsonWrapper.getLong("T"));
+
                 OrderUpdate orderUpdate = new OrderUpdate();
                 JsonWrapper jsondata = jsonWrapper.getJsonObject("o");
                 orderUpdate.setSymbol(jsondata.getString("s"));
@@ -508,8 +513,6 @@ class WebsocketRequestImpl {
                 orderUpdate.setLastFilledQty(jsondata.getBigDecimal("l"));
                 orderUpdate.setCumulativeFilledQty(jsondata.getBigDecimal("z"));
                 orderUpdate.setLastFilledPrice(jsondata.getBigDecimal("L"));
-                orderUpdate.setCommissionAsset(jsondata.getString("N"));
-                orderUpdate.setCommissionAmount(jsondata.getLong("n"));
                 orderUpdate.setOrderTradeTime(jsondata.getLong("T"));
                 orderUpdate.setTradeID(jsondata.getLong("t"));
                 orderUpdate.setBidsNotional(jsondata.getBigDecimal("b"));
@@ -517,9 +520,42 @@ class WebsocketRequestImpl {
                 orderUpdate.setIsMarkerSide(jsondata.getBoolean("m"));
                 orderUpdate.setIsReduceOnly(jsondata.getBoolean("R"));
                 orderUpdate.setWorkingType(jsondata.getString("wt"));
+                orderUpdate.setOriginalOrderType(jsondata.getString(("ot")));
+                orderUpdate.setPositionSide(jsondata.getString(("ps")));
+                if(jsondata.containKey("N"))
+                    orderUpdate.setCommissionAsset(jsondata.getString("N"));
+                if(jsondata.containKey("n"))
+                    orderUpdate.setCommissionAmount(jsondata.getBigDecimal("n"));
+                if(jsondata.containKey("AP"))
+                    orderUpdate.setActivationPrice(jsondata.getBigDecimal("AP"));
+                if(jsondata.containKey("cr"))
+                    orderUpdate.setCallbackRate(jsondata.getBigDecimal("cr"));
+
                 result.setOrderUpdate(orderUpdate); 
+            } else if(jsonWrapper.getString("e").equals("MARGIN_CALL")) {
+                MarginCallUpdate marginCallUpdate = new MarginCallUpdate();
+
+                marginCallUpdate.setCrossWalletBalance(jsonWrapper.getBigDecimal("cw"));
+
+                List<PositionUpdate> positionList = new LinkedList<>();
+                JsonWrapperArray datalist = jsonWrapper.getJsonArray("p");
+                datalist.forEach(item -> {
+                    PositionUpdate position = new PositionUpdate();
+                    position.setSymbol(item.getString("s"));
+                    position.setPositionSide(item.getString("ps"));
+                    position.setAmount(item.getBigDecimal("pa"));
+                    position.setMarginType(item.getString("mt"));
+                    position.setIsolatedWallet(item.getBigDecimal("iw"));
+                    position.setMarkPrice(item.getBigDecimal("mp"));
+                    position.setUnrealizedPnl(item.getBigDecimal("up"));
+                    position.setMaintMarginRequired(item.getBigDecimal("mm"));
+                    positionList.add(position);
+                });
+                marginCallUpdate.setPositions(positionList);
+
+                result.setMarginCallUpdate(marginCallUpdate);
             }
-            
+
             return result;
         };
         return request;

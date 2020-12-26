@@ -15,6 +15,8 @@ public class UserDataUpdateEvent {
 
     private OrderUpdate orderUpdate;
 
+    private MarginCallUpdate marginCallUpdate;
+
     public String getEventType() {
         return eventType;
     }
@@ -55,10 +57,14 @@ public class UserDataUpdateEvent {
         this.orderUpdate = orderUpdate;
     }
 
+    public MarginCallUpdate getMarginCallUpdate() { return marginCallUpdate; }
+
+    public void setMarginCallUpdate(MarginCallUpdate marginCallUpdate) { this.marginCallUpdate = marginCallUpdate; }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceApiConstants.TO_STRING_BUILDER_STYLE).append("eventType", eventType)
                 .append("eventTime", eventTime).append("accountUpdate", accountUpdate)
-                .append("orderUpdate", orderUpdate).toString();
+                .append("orderUpdate", orderUpdate).append("marginCallUpdate", marginCallUpdate).toString();
     }
 }
