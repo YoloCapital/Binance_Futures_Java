@@ -15,7 +15,13 @@ public class Income {
 
     private String asset;
 
+    private String info;
+
     private Long time;
+
+    private String txId;
+
+    private String tradeId;
 
     public String getSymbol() {
         return symbol;
@@ -57,10 +63,25 @@ public class Income {
         this.time = time;
     }
 
+    public String getInfo() { return info; }
+
+    public void setInfo(String info) { this.info = info; }
+
+    public String getTxId() { return txId; }
+
+    public void setTxId(String txId) { this.txId = txId; }
+
+    public String getTradeId() { return tradeId; }
+
+    public void setTradeId(String tradeId) { this.tradeId = tradeId; }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this, BinanceApiConstants.TO_STRING_BUILDER_STYLE).append("symbol", symbol)
-                .append("incomeType", incomeType).append("income", income).append("asset", asset).append("time", time)
+        return new ToStringBuilder(this, BinanceApiConstants.TO_STRING_BUILDER_STYLE)
+                .append("symbol", symbol).append("incomeType", incomeType)
+                .append("income", income).append("asset", asset)
+                .append("info", info).append("time", time)
+                .append("txId", txId).append("tradeId", tradeId)
                 .toString();
     }
 }
