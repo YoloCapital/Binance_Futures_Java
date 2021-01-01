@@ -69,6 +69,8 @@ class WebsocketRequestImpl {
             result.setEventTime(jsonWrapper.getLong("E"));
             result.setSymbol(jsonWrapper.getString("s"));
             result.setMarkPrice(jsonWrapper.getBigDecimal("p"));
+            result.setIndexPrice(jsonWrapper.getBigDecimal("i"));
+            result.setEstimatedSettlePrice(jsonWrapper.getBigDecimal("P"));
             result.setFundingRate(jsonWrapper.getBigDecimal("r"));
             result.setNextFundingTime(jsonWrapper.getLong("T"));
             return result;
