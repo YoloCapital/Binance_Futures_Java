@@ -34,7 +34,7 @@ public class ExchangeInfoEntry {
 
     private List<String> timeInForce;
 
-    private List<List<Map<String, String>>> filters;
+    private List<Map<String, String>> filters;
 
     public String getSymbol() {
         return symbol;
@@ -132,11 +132,11 @@ public class ExchangeInfoEntry {
         this.timeInForce = timeInForce;
     }
 
-    public List<List<Map<String, String>>> getFilters() {
+    public List<Map<String, String>> getFilters() {
         return filters;
     }
 
-    public void setFilters(List<List<Map<String, String>>> filters) {
+    public void setFilters(List<Map<String, String>> filters) {
         this.filters = filters;
     }
 

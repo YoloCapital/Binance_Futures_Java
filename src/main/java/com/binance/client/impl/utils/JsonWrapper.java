@@ -206,13 +206,11 @@ public class JsonWrapper {
         return json;
     }
 
-    public List<Map<String, String>> convert2DictList() {
-        List<Map<String, String>> result = new LinkedList<>();
+    public Map<String, String> convert2Dict() {
+        Map<String, String> result = new LinkedHashMap<>();
         Set<String> keys = this.json.keySet();
         keys.forEach((key) -> {
-            Map<String, String> temp = new LinkedHashMap<>();
-            temp.put(key, this.getString(key));
-            result.add(temp);
+            result.put(key, this.getString(key));
         });
         return result;
     }
